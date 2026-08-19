@@ -25,4 +25,19 @@ describe('TreeStore', () => {
   it('getItem returns undefined for unknown id', () => {
     expect(store.getItem(999)).toBeUndefined();
   });
+
+  it('returns direct children', () => {
+    expect(store.getChildren(1)).toEqual([
+      items[1],
+      items[2],
+    ]);
+  });
+
+  it('returns empty array when there are no children', () => {
+    expect(store.getChildren(3)).toEqual([]);
+  });
+
+  it('returns empty array for unknown id', () => {
+    expect(store.getChildren(999)).toEqual([]);
+  });
 });
