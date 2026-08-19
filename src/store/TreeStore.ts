@@ -23,4 +23,16 @@ export class TreeStore<T extends TreeItem> {
   getItem(id: Id): T | undefined {
     return this.items.get(id);
   }
+
+  getChildren(id: Id): T[] {
+    const childIds = this.children.get(id);
+
+    if (!childIds) {
+      return [];
+    }
+
+    return [...childIds]
+      .map((childId) => this.items.get(childId))
+      .filter((item): item is T => item !== undefined);
+  }
 }
