@@ -35,4 +35,30 @@ export class TreeStore<T extends TreeItem> {
       .map((childId) => this.items.get(childId))
       .filter((item): item is T => item !== undefined);
   }
+
+  getAllChildren(id: Id): T[] {
+    const result: T[] = [];
+    const queue = [...(this.children.get(id) ?? [])];
+
+    let index = 0;
+
+    while (index < queue.length) {
+      const childId = queue[index++];
+      const child = this.items.get(childId);
+
+      if (!child) {
+        continue;
+      }
+
+      result.push(child);
+
+      const children = this.children.get(childId);
+
+      if (children) {
+        queue.push(...children);
+      }
+    }
+
+    return result;
+  }
 }
