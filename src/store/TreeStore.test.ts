@@ -40,4 +40,14 @@ describe('TreeStore', () => {
   it('returns empty array for unknown id', () => {
     expect(store.getChildren(999)).toEqual([]);
   });
+
+  it('returns all children', () => {
+    expect(store.getAllChildren(1)).toEqual([
+      items[1],
+      items[2],
+      items[3],
+      items[4],
+      items[5],
+    ]);
+  });
 });
