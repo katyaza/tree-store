@@ -61,4 +61,22 @@ export class TreeStore<T extends TreeItem> {
 
     return result;
   }
+
+  getAllParents(id: Id): T[] {
+    const result: T[] = [];
+    let currentId: Id | null = id;
+
+    while (currentId !== null) {
+      const item = this.items.get(currentId);
+
+      if (!item) {
+        return [];
+      }
+
+      result.push(item);
+      currentId = item.parent;
+    }
+
+    return result;
+  }
 }
