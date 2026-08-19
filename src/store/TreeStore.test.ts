@@ -50,4 +50,22 @@ describe('TreeStore', () => {
       items[5],
     ]);
   });
+  it('returns all parents from item to root', () => {
+    expect(store.getAllParents(6)).toEqual([
+      items[5],
+      items[3],
+      items[1],
+      items[0],
+    ]);
+  });
+
+  it('returns only the item for root', () => {
+    expect(store.getAllParents(1)).toEqual([
+      items[0],
+    ]);
+  });
+
+  it('returns empty array for unknown id', () => {
+    expect(store.getAllParents(999)).toEqual([]);
+  });
 });
