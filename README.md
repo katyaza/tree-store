@@ -17,16 +17,19 @@ npm install
 ```
 
 ## Запуск проекта
-
+```bash
 npm run dev
+```
 
 ## Сборка проекта
-
+```bash
 npm run build
+```
 
 ## Запуск тестов
-
+```bash
 npm run test
+```
 
 ## Что реализовано
 TreeStore
