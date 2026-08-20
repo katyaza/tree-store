@@ -79,4 +79,56 @@ export class TreeStore<T extends TreeItem> {
 
     return result;
   }
+
+  addItem(item: T): void {
+    this.items.set(item.id, item);
+
+    if (!this.children.has(item.parent)) {
+      this.children.set(item.parent, new Set());
+    }
+
+    this.children.get(item.parent)!.add(item.id);
+  }
+
+  removeItem(id: Id): void {
+    const item = this.items.get(id);
+
+    if (!item) {
+      return;
+    }
+
+    const idsToRemove = [id];
+    let index = 0;
+
+    while (index < idsToRemove.length) {
+      const currentId = idsToRemove[index++];
+
+      const children = this.children.get(currentId);
+
+      if (children) {
+        idsToRemove.push(...children);
+      }
+    }
+
+    for (const currentId of idsToRemove) {
+      const currentItem = this.items.get(currentId);
+
+      if (!currentItem) {
+        continue;
+      }
+
+      this.items.delete(currentId);
+      this.children.delete(currentId);
+    }
+
+    const parentChildren = this.children.get(item.parent);
+
+    if (parentChildren) {
+      parentChildren.delete(id);
+
+      if (parentChildren.size === 0) {
+        this.children.delete(item.parent);
+      }
+    }
+  }
 }
