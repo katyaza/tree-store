@@ -131,4 +131,28 @@ export class TreeStore<T extends TreeItem> {
       }
     }
   }
+
+  updateItem(item: T): void {
+    const currentItem = this.items.get(item.id);
+
+    if (!currentItem) {
+      return;
+    }
+
+    if (currentItem.parent !== item.parent) {
+      const oldParentChildren = this.children.get(currentItem.parent);
+
+      if (oldParentChildren) {
+        oldParentChildren.delete(item.id);
+      }
+
+      if (!this.children.has(item.parent)) {
+        this.children.set(item.parent, new Set());
+      }
+
+      this.children.get(item.parent)!.add(item.id);
+    }
+
+    this.items.set(item.id, item);
+  }
 }
