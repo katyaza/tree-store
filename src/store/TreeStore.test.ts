@@ -94,4 +94,37 @@ describe('TreeStore', () => {
     expect(store.getItem(1)).toEqual(items[0]);
     expect(store.getItem(3)).toEqual(items[2]);
   });
+
+  it('updates an item', () => {
+    const store = new TreeStore(items);
+
+    const updatedItem = {
+      id: 4,
+      parent: '2',
+      label: 'Updated Item',
+    };
+
+    store.updateItem(updatedItem);
+
+    expect(store.getItem(4)).toEqual(updatedItem);
+  });
+  it('updates parent when it is changed', () => {
+    const store = new TreeStore(items);
+
+    const updatedItem = {
+      id: 4,
+      parent: 3,
+      label: 'Updated Item',
+    };
+
+    store.updateItem(updatedItem);
+
+    expect(store.getChildren('2')).toEqual([
+      items[4],
+    ]);
+
+    expect(store.getChildren(3)).toEqual([
+      updatedItem,
+    ]);
+  });
 });
