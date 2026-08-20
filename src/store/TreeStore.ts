@@ -8,11 +8,14 @@ export class TreeStore<T extends TreeItem> {
     for (const item of items) {
       this.items.set(item.id, item);
 
-      if (!this.children.has(item.parent)) {
-        this.children.set(item.parent, new Set());
+      let childIds = this.children.get(item.parent);
+
+      if (!childIds) {
+        childIds = new Set<Id>();
+        this.children.set(item.parent, childIds);
       }
 
-      this.children.get(item.parent)!.add(item.id);
+      childIds.add(item.id);
     }
   }
 
@@ -31,9 +34,17 @@ export class TreeStore<T extends TreeItem> {
       return [];
     }
 
-    return [...childIds]
-      .map((childId) => this.items.get(childId))
-      .filter((item): item is T => item !== undefined);
+    const result: T[] = [];
+
+    for (const childId of childIds) {
+      const child = this.items.get(childId);
+
+      if (child) {
+        result.push(child);
+      }
+    }
+
+    return result;
   }
 
   getAllChildren(id: Id): T[] {
@@ -52,10 +63,12 @@ export class TreeStore<T extends TreeItem> {
 
       result.push(child);
 
-      const children = this.children.get(childId);
+      const childIds = this.children.get(childId);
 
-      if (children) {
-        queue.push(...children);
+      if (childIds) {
+        for (const id of childIds) {
+          queue.push(id);
+        }
       }
     }
 
@@ -64,6 +77,7 @@ export class TreeStore<T extends TreeItem> {
 
   getAllParents(id: Id): T[] {
     const result: T[] = [];
+
     let currentId: Id | null = id;
 
     while (currentId !== null) {
@@ -83,11 +97,14 @@ export class TreeStore<T extends TreeItem> {
   addItem(item: T): void {
     this.items.set(item.id, item);
 
-    if (!this.children.has(item.parent)) {
-      this.children.set(item.parent, new Set());
+    let childIds = this.children.get(item.parent);
+
+    if (!childIds) {
+      childIds = new Set<Id>();
+      this.children.set(item.parent, childIds);
     }
 
-    this.children.get(item.parent)!.add(item.id);
+    childIds.add(item.id);
   }
 
   removeItem(id: Id): void {
@@ -97,26 +114,23 @@ export class TreeStore<T extends TreeItem> {
       return;
     }
 
-    const idsToRemove = [id];
+    const idsToRemove: Id[] = [id];
+
     let index = 0;
 
     while (index < idsToRemove.length) {
       const currentId = idsToRemove[index++];
 
-      const children = this.children.get(currentId);
+      const childIds = this.children.get(currentId);
 
-      if (children) {
-        idsToRemove.push(...children);
+      if (childIds) {
+        for (const childId of childIds) {
+          idsToRemove.push(childId);
+        }
       }
     }
 
     for (const currentId of idsToRemove) {
-      const currentItem = this.items.get(currentId);
-
-      if (!currentItem) {
-        continue;
-      }
-
       this.items.delete(currentId);
       this.children.delete(currentId);
     }
@@ -144,13 +158,20 @@ export class TreeStore<T extends TreeItem> {
 
       if (oldParentChildren) {
         oldParentChildren.delete(item.id);
+
+        if (oldParentChildren.size === 0) {
+          this.children.delete(currentItem.parent);
+        }
       }
 
-      if (!this.children.has(item.parent)) {
-        this.children.set(item.parent, new Set());
+      let newParentChildren = this.children.get(item.parent);
+
+      if (!newParentChildren) {
+        newParentChildren = new Set<Id>();
+        this.children.set(item.parent, newParentChildren);
       }
 
-      this.children.get(item.parent)!.add(item.id);
+      newParentChildren.add(item.id);
     }
 
     this.items.set(item.id, item);
