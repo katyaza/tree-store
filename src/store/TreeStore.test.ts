@@ -68,4 +68,30 @@ describe('TreeStore', () => {
   it('returns empty array for unknown id', () => {
     expect(store.getAllParents(999)).toEqual([]);
   });
+
+  it('add a new item', () => {
+    const newItem = {
+      id: 7,
+      parent: 3,
+      label: 'Item 7',
+    };
+
+    store.addItem(newItem);
+
+    expect(store.getItem(7)).toEqual(newItem);
+    expect(store.getChildren(3)).toContainEqual(newItem);
+  });
+
+  it('removes item and all its children', () => {
+    const store = new TreeStore(items);
+
+    store.removeItem('2');
+
+    expect(store.getItem('2')).toBeUndefined();
+    expect(store.getItem(4)).toBeUndefined();
+    expect(store.getItem(5)).toBeUndefined();
+    expect(store.getItem(6)).toBeUndefined();
+    expect(store.getItem(1)).toEqual(items[0]);
+    expect(store.getItem(3)).toEqual(items[2]);
+  });
 });
